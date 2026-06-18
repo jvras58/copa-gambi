@@ -1,0 +1,39 @@
+[project]
+name = "copa-gambi"
+version = "0.1.0"
+description = "Distributed multi-model World Cup score debate via Gambi Hub."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "jvras58", email = "jvras58@gmail.com" }]
+dependencies = [
+    "agno>=2.5.0",
+    "httpx>=0.28.0",
+    "openai>=1.54.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+    "typer>=0.15.0",
+]
+
+[project.scripts]
+copa-gambi = "copa_gambi.cli.main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/copa_gambi"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["E501"]

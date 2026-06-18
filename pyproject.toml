@@ -8,8 +8,10 @@ license = { text = "MIT" }
 authors = [{ name = "jvras58", email = "jvras58@gmail.com" }]
 dependencies = [
     "agno>=2.5.0",
+    "ddgs>=9.14.4",
     "httpx>=0.28.0",
     "openai>=1.54.0",
+    "praw>=8.0.1",
     "pydantic>=2.9.0",
     "pydantic-settings>=2.6.0",
     "typer>=0.15.0",

@@ -34,6 +34,24 @@ class Settings(BaseSettings):
         description="Directory containing shared Agno skills (relative to CWD when not absolute).",
     )
 
+    reddit_client_id: str | None = Field(
+        default=None,
+        description="Reddit OAuth client id. When unset, RedditTools is skipped.",
+    )
+    reddit_client_secret: str | None = Field(
+        default=None,
+        description="Reddit OAuth client secret. When unset, RedditTools is skipped.",
+    )
+    reddit_user_agent: str = Field(
+        default="copa-gambi/0.1 (sentiment)",
+        description="User-Agent string Reddit requires for API access.",
+    )
+
+    football_data_token: str | None = Field(
+        default=None,
+        description="football-data.org API token. When unset, the stats tool is skipped.",
+    )
+
     @property
     def hub_base(self) -> str:
         return str(self.hub_url).rstrip("/")

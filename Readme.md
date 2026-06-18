@@ -39,6 +39,7 @@ Variáveis lidas via `pydantic-settings` (prefixo `COPA_`, arquivo `.env`):
 | `COPA_ROOM_CODE`     | `ABC123`                 | Código da room criado em `gambi room create`|
 | `COPA_API_KEY`       | `gambi`                  | API key enviada ao endpoint OpenAI-compat   |
 | `COPA_REQUEST_TIMEOUT` | `30`                   | Timeout HTTP (segundos)                     |
+| `COPA_SKILLS_DIR`    | `skills`                 | Diretório das skills compartilhadas (Agno)  |
 
 ---
 
@@ -99,6 +100,7 @@ copa-gambi/
     │   └── hub.py          # fetch_participants, elect_moderator
     └── agents/
         ├── instructions.py # SHARED_INSTRUCTIONS, MODERATOR_INSTRUCTIONS
+        ├── skills.py       # load_shared_skills (Agno LocalSkills loader)
         ├── factory.py      # make_agent, build_model
         └── team.py         # build_team, build_team_from_hub
 ```
@@ -124,7 +126,9 @@ Para adicionar uma dependência: `uv add <pkg>` (ou `uv add --dev <pkg>` para gr
 | Texto das instruções dos agentes ou do moderador | [src/copa_gambi/agents/instructions.py](src/copa_gambi/agents/instructions.py) |
 | Regra de eleição do moderador (hoje: maior VRAM) | [src/copa_gambi/core/hub.py](src/copa_gambi/core/hub.py) — `elect_moderator` |
 | Campos extras esperados do Gambi (CPU, RAM, etc.) | [src/copa_gambi/core/schemas.py](src/copa_gambi/core/schemas.py) |
-| Tools/skills dos agentes (xG, sentimento etc.) | [src/copa_gambi/agents/factory.py](src/copa_gambi/agents/factory.py) + arquivos em `skills/` |
+| Skills compartilhadas (lista carregada) | [src/copa_gambi/agents/skills.py](src/copa_gambi/agents/skills.py) — `SKILL_DIRS` |
+| Conteúdo de uma skill (instruções + scripts) | [skills/<nome>/SKILL.md](skills/) + `scripts/` ao lado |
+| Tools executáveis pelos agentes (xG, sentimento) | [src/copa_gambi/agents/factory.py](src/copa_gambi/agents/factory.py) — passar `tools=[...]` |
 | Novo subcomando CLI | [src/copa_gambi/cli/main.py](src/copa_gambi/cli/main.py) |
 
 Mais detalhes em:

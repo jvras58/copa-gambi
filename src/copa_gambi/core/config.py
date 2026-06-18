@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field, HttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -27,6 +28,10 @@ class Settings(BaseSettings):
     request_timeout: float = Field(
         default=30.0,
         description="HTTP timeout (seconds) when calling the Hub.",
+    )
+    skills_dir: Path = Field(
+        default=Path("skills"),
+        description="Directory containing shared Agno skills (relative to CWD when not absolute).",
     )
 
     @property

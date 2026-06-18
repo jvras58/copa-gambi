@@ -1,3 +1,8 @@
+---
+name: sentiment-skill
+description: Sentimento popular sobre o jogo via posts do X, threads do Reddit e manchetes, usado como sinal complementar (nunca único) na previsão do placar.
+---
+
 # sentiment-skill
 
 Sentimento popular sobre o jogo: posts do X, threads do Reddit, manchetes.

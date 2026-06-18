@@ -1,3 +1,8 @@
+---
+name: tactical-skill
+description: Avaliação tática do confronto (formações, escalações, lesões e clima) e como esses fatores empurram o placar para um lado ou outro.
+---
+
 # tactical-skill
 
 Avaliação tática: formações, escalações, lesões e clima.

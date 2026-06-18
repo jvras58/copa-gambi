@@ -1,3 +1,8 @@
+---
+name: stats-skill
+description: Estatísticas avançadas do jogo (xG, posse, gols, defesa e histórico de confrontos diretos) usadas para sustentar a previsão com números concretos.
+---
+
 # stats-skill
 
 Estatísticas avançadas do jogo: xG, posse de bola, gols, defesa, confrontos diretos.

@@ -82,21 +82,30 @@ jobs:
 
 ---
 
-## 3. Skills como tools dos agentes (Agno)
+## 3. Scripts das skills como Agno tools
 
-**Objetivo.** Hoje os scripts em `skills/*/scripts/` existem mas os agentes não conseguem chamá-los.
-Plugar como tools do Agno para que cada agente decida quando buscar stats / sentimento / formação.
+> ✅ Carregamento das skills via `agno.skills.Skills` + `LocalSkills` já está
+> implementado em [agents/skills.py](../src/copa_gambi/agents/skills.py) e
+> plugado no [agents/factory.py](../src/copa_gambi/agents/factory.py).
+> O que falta é o passo abaixo: transformar os **scripts** dentro de cada skill
+> em tools executáveis pelos agentes.
+
+**Objetivo.** Hoje os `SKILL.md` chegam aos agentes como contexto (instruções
+de quando/como usar), mas `scripts/fetch_stats.py` e `scripts/fetch_sentiment.py`
+ainda não rodam — são só stubs documentais. Plugar como tools para que cada
+agente decida quando buscar stats / sentimento / formação.
 
 **Onde mexer.**
 - Criar `src/copa_gambi/agents/tools/` com funções/classes plugáveis:
   - `stats.py` — wrapper sobre [skills/stats-skill/scripts/fetch_stats.py](../skills/stats-skill/scripts/fetch_stats.py)
   - `sentiment.py` — wrapper sobre [skills/sentiment-skill/scripts/fetch_sentiment.py](../skills/sentiment-skill/scripts/fetch_sentiment.py)
   - `tactical.py` — lookup em [skills/tactical-skill/references/formations.md](../skills/tactical-skill/references/formations.md)
-- Em [agents/factory.py](../src/copa_gambi/agents/factory.py), passar `tools=[...]` ao `Agent(...)`.
+- Em [agents/factory.py](../src/copa_gambi/agents/factory.py), passar `tools=[...]` ao `Agent(...)` ao lado do `skills=[...]` que já existe.
 - Esquema sugerido (Agno aceita callables ou `Toolkit`):
   ```python
   Agent(
       ...,
+      skills=shared_skills,
       tools=[get_match_stats, get_public_sentiment, lookup_formation],
       show_tool_calls=True,
   )
@@ -106,7 +115,7 @@ Plugar como tools do Agno para que cada agente decida quando buscar stats / sent
 **Done when.**
 - Pelo menos uma tool real chamada por um agente em um run de exemplo.
 - Tools mockáveis em teste (não dependem de credencial em CI).
-- README atualizado com "como adicionar uma skill" em uma seção.
+- README atualizado com "como adicionar uma skill + tool" em uma seção.
 
 **Notas.**
 - Credenciais de APIs externas (football-data.org, X) vêm via `Settings` (novos campos em `core/config.py`), nunca hardcoded.

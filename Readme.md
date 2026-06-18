@@ -1,9 +1,10 @@
+
 # ⚽ World Cup Score Predictor — Distributed Multi-Model Debate
 
 Sistema distribuído onde múltiplas pessoas conectam seus modelos locais via **Gambi Hub**,
 cada um analisa o mesmo jogo de forma independente com as mesmas skills, e o modelo
-com mais poder de processamento atua como **moderador** — agrupando os resultados
-dinamicamente e calculando a probabilidade de cada previsão.
+com mais poder de processamento (eleito automaticamente pelos specs do Gambi) atua como
+**moderador** — agrupando os resultados dinamicamente e calculando a probabilidade de cada previsão.
 
 ---
 
@@ -16,13 +17,13 @@ flowchart TD
     subgraph BM["BROADCAST MODE"]
         direction TB
 
-        B0["Todos recebem o mesmo input,<br/>as mesmas skills e cada modelo decide livremente via Gambi Hub"]
+        B0["Participantes descobertos dinamicamente via Gambi Hub<br/>Todos recebem o mesmo input e as mesmas skills<br/>Cada modelo decide livremente"]
 
-        B1["llama3.3:70b<br/>previsão independente"]
-        B2["mistral<br/>previsão independente"]
-        B3["deepseek-r1<br/>previsão independente"]
-        B4["gemma3<br/>previsão independente"]
-        B5["qwen2.5<br/>previsão independente"]
+        B1["joao-1::llama3.3:70b<br/>previsão independente"]
+        B2["maria-1::mistral<br/>previsão independente"]
+        B3["pedro-1::deepseek-r1<br/>previsão independente"]
+        B4["joao-2::llama3.3:70b<br/>previsão independente"]
+        B5["ana-1::qwen2.5:72b<br/>previsão independente"]
 
         B0 --> B1
         B0 --> B2
@@ -37,12 +38,12 @@ flowchart TD
     B4 --> C1
     B5 --> C1
 
-    subgraph MOD["⭐ MODERADOR — modelo mais potente (ReasoningTools)"]
+    subgraph MODR["⭐ MODERADOR — maior gpu_vram_gb (ReasoningTools)"]
         direction TB
 
         C1["1. Lê todas as previsões"]
         C2["2. Agrupa as similares dinamicamente<br/>(A, B, C, D...)"]
-        C3["3. Calcula a probabilidade<br/>de cada grupo"]
+        C3["3. Calcula a probabilidade de cada grupo"]
         C4["4. Declara o placar com maior probabilidade"]
 
         C1 --> C2 --> C3 --> C4
@@ -62,7 +63,7 @@ O moderador cria os grupos dinamicamente — podem ser 2, 3 ou mais:
 
 GRUPO A — 60% de probabilidade
   Placar: Brasil 2 x 1 Argentina
-  Modelos: llama3.3:70b, mistral, deepseek-r1
+  Modelos: joao-1::llama3.3:70b, maria-1::mistral, pedro-1::deepseek-r1
   Argumentos:
     - Brasil com melhor xG nos últimos 5 jogos
     - Sentimento popular 72% favorável ao Brasil no X
@@ -70,14 +71,14 @@ GRUPO A — 60% de probabilidade
 
 GRUPO B — 20% de probabilidade
   Placar: Empate 1 x 1
-  Modelos: gemma3
+  Modelos: joao-2::llama3.3:70b
   Argumentos:
     - Histórico de empates em fases de grupos
     - Defesa argentina sólida nos últimos 3 jogos
 
 GRUPO C — 20% de probabilidade
   Placar: Argentina 1 x 0 Brasil
-  Modelos: qwen2.5
+  Modelos: ana-1::qwen2.5:72b
   Argumentos:
     - Argentina venceu os últimos 2 confrontos diretos
 
@@ -112,25 +113,32 @@ gambi room create --name "worldcup-debate"
 # Ollama (padrão — localhost:11434)
 gambi participant join \
   --room ABC123 \
-  --participant-id joao-llama \
+  --participant-id joao-1 \
+  --model llama3.3:70b
+
+# Outro João com o mesmo modelo — participant-id diferente garante unicidade
+gambi participant join \
+  --room ABC123 \
+  --participant-id joao-2 \
   --model llama3.3:70b
 
 # LM Studio
 gambi participant join \
   --room ABC123 \
-  --participant-id maria-mistral \
+  --participant-id maria-1 \
   --model mistral \
   --endpoint http://localhost:1234
 
 # vLLM
 gambi participant join \
   --room ABC123 \
-  --participant-id pedro-deepseek \
+  --participant-id pedro-1 \
   --model deepseek-r1 \
   --endpoint http://localhost:8000
 ```
 
-> ⭐ **O participante com mais poder de processamento deve ser designado como moderador** — idealmente o modelo com mais parâmetros ou GPU mais potente.
+> ⭐ O moderador é eleito **automaticamente** pelo Agno — o participante com maior `gpu_vram_gb`
+> nos specs que o Gambi compartilha ao conectar. Não é necessário designar manualmente.
 
 ---
 
@@ -161,19 +169,15 @@ skills/
 ## Código Base
 
 ```python
+import httpx
 from agno.agent import Agent
 from agno.team import Team
 from agno.team.mode import TeamMode
 from agno.tools.reasoning import ReasoningTools
 from agno.models.openai.like import OpenAILike
-from agno.skills import Skills, LocalSkills
 
-# --- Skills compartilhadas ---
-stats_skill    = Skills(loaders=[LocalSkills("skills/stats-skill")])
-tactical_skill = Skills(loaders=[LocalSkills("skills/tactical-skill")])
-sentiment_skill = Skills(loaders=[LocalSkills("skills/sentiment-skill")])
-
-HUB_URL = "http://hub-ip:3000/v1"  # endpoint do Gambi Hub
+HUB_URL = "http://hub-ip:3000"
+ROOM_CODE = "ABC123"
 
 SHARED_INSTRUCTIONS = [
     "Analise o jogo usando dados estatísticos (xG, posse, gols, defesa).",
@@ -183,39 +187,44 @@ SHARED_INSTRUCTIONS = [
     "Seja independente — chegue à sua própria conclusão.",
 ]
 
-# Participantes conectados ao Gambi Hub
-PARTICIPANTS = [
-    {"name": "João - Llama3",    "model": "llama3.3:70b"},
-    {"name": "Maria - Mistral",  "model": "mistral"},
-    {"name": "Pedro - DeepSeek", "model": "deepseek-r1"},
-    {"name": "Ana - Gemma3",     "model": "gemma3"},
-    {"name": "Carlos - Qwen",    "model": "qwen2.5"},
-]
+def fetch_participants():
+    """Busca participantes ativos do room via Gambi Hub"""
+    response = httpx.get(f"{HUB_URL}/rooms/{ROOM_CODE}/participants")
+    response.raise_for_status()
+    return response.json()
 
-# ⭐ Moderador — participante com mais poder de processamento
-MODERATOR_MODEL = "qwen2.5:72b"  # troque pelo modelo mais potente disponível
-
-def make_agent(name, model_id):
+def make_agent(participant):
+    unique_id = f"{participant['participant_id']}::{participant['model']}"
     return Agent(
-        name=name,
+        name=unique_id,  # ex: "joao-1::llama3.3:70b" — único mesmo com dois Joãos
         model=OpenAILike(
-            id=model_id,
-            base_url=HUB_URL,
-            api_key="gambi",  # local não precisa de key real
-            skills=[stats_skill,tactical_skill,sentiment_skill],
+            id=participant["model"],
+            base_url=f"{HUB_URL}/v1",
+            api_key="gambi",
         ),
         role="Analista independente de futebol",
         instructions=SHARED_INSTRUCTIONS,
     )
 
-agents = [make_agent(p["name"], p["model"]) for p in PARTICIPANTS]
+# Descobre participantes dinamicamente
+participants = fetch_participants()
+
+# Elege moderador automaticamente pelo maior poder de GPU
+moderator_participant = max(participants, key=lambda p: p["specs"]["gpu_vram_gb"])
+
+# Demais participantes viram agentes do debate
+agents = [
+    make_agent(p)
+    for p in participants
+    if p["participant_id"] != moderator_participant["participant_id"]
+]
 
 moderator = Team(
     name="World Cup Debate Team",
     mode=TeamMode.broadcast,
     model=OpenAILike(
-        id=MODERATOR_MODEL,
-        base_url=HUB_URL,
+        id=moderator_participant["model"],
+        base_url=f"{HUB_URL}/v1",
         api_key="gambi",
     ),
     members=agents,
@@ -255,10 +264,6 @@ if __name__ == "__main__":
 
 ---
 
-A lógica principal: o moderador é **apenas mais um participante do Gambi Hub**, mas é o modelo designado com mais poder — ele recebe todos os resultados via broadcast e agrupa dinamicamente.
-
-```suggestions
-(OpenAI-compatible models)[/models/providers/openai-like]
-(Broadcast Mode Debate)[/examples/teams/modes/broadcast/debate]
-(Team with Reasoning Tools)[/reasoning/usage/tools/reasoning-tool-team]
-```
+As duas mudanças principais refletidas:
+- **ID único**: `participant_id::model` garante distinção mesmo entre dois Joãos com o mesmo modelo
+- **Descoberta dinâmica**: `fetch_participants()` busca quem está no room em tempo real — ninguém precisa editar código para entrar no debate

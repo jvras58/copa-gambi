@@ -6,35 +6,46 @@ Sistema onde múltiplos modelos de IA independentes analisam o mesmo jogo com as
 
 ## Como Funciona
 
-```
-[Input: Jogo da Copa — ex: Brasil x Argentina]
-                    │
-                    ▼
-┌──────────────────────────────────────────────────────────┐
-│                    BROADCAST MODE                        │
-│   Todos recebem o mesmo input, mesmas skills,            │
-│   mesmas ferramentas — cada um decide livremente         │
-│                                                          │
-│  🤖 GPT-4o       → previsão independente                 │
-│  🤖 Gemini       → previsão independente                 │
-│  🤖 Grok         → previsão independente                 │
-│  🤖 Mistral      → previsão independente                 │
-│  🤖 DeepSeek     → previsão independente                 │
-│  🤖 Groq/Llama   → previsão independente                 │
-└──────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-┌──────────────────────────────────────────────────────────┐
-│         MODERADOR (ReasoningTools)                       │
-│                                                          │
-│  1. Lê todas as previsões                                │
-│  2. Agrupa as similares (Grupo A, B, C... dinamicamente) │
-│  3. Calcula probabilidade de cada grupo                  │
-│  4. Apresenta ranking com argumentos de cada grupo       │
-└──────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-         [Output: Relatório Final]
+```mermaid
+flowchart TD
+    A["Input: Jogo da Copa<br/>ex: Brasil x Argentina"]
+
+    A --> B
+
+    subgraph B["BROADCAST MODE"]
+        direction TB
+
+        B0["Todos recebem o mesmo input,<br/>mesmas skills e mesmas ferramentas.<br/>Cada modelo decide livremente."]
+
+        B1["🤖 GPT-4o<br/>previsão independente"]
+        B2["🤖 Gemini<br/>previsão independente"]
+        B3["🤖 Grok<br/>previsão independente"]
+        B4["🤖 Mistral<br/>previsão independente"]
+        B5["🤖 DeepSeek<br/>previsão independente"]
+        B6["🤖 Groq / Llama<br/>previsão independente"]
+
+        B0 --> B1
+        B0 --> B2
+        B0 --> B3
+        B0 --> B4
+        B0 --> B5
+        B0 --> B6
+    end
+
+    B --> C
+
+    subgraph C["MODERADOR — ReasoningTools"]
+        direction TB
+
+        C1["1. Lê todas as previsões"]
+        C2["2. Agrupa previsões similares<br/>Grupo A, Grupo B, Grupo C..."]
+        C3["3. Calcula a probabilidade<br/>de cada grupo"]
+        C4["4. Apresenta ranking final<br/>com argumentos de cada grupo"]
+
+        C1 --> C2 --> C3 --> C4
+    end
+
+    C --> D["Output: Relatório Final"]
 ```
 
 ---
@@ -97,7 +108,7 @@ skills/
 
 ---
 
-## Código Base
+## Código Base versão Apis pagas/free tier
 
 ```python
 from agno.agent import Agent
@@ -110,6 +121,13 @@ from agno.models.xai import xAI
 from agno.models.mistral import Mistral
 from agno.models.deepseek import DeepSeek
 from agno.models.groq import Groq
+from agno.skills import Skills, LocalSkills
+
+# --- Skills compartilhadas ---
+stats_skill    = Skills(loaders=[LocalSkills("skills/stats-skill")])
+tactical_skill = Skills(loaders=[LocalSkills("skills/tactical-skill")])
+sentiment_skill = Skills(loaders=[LocalSkills("skills/sentiment-skill")])
+
 
 # Instruções compartilhadas — todos analisam da mesma forma
 SHARED_INSTRUCTIONS = [
@@ -124,6 +142,7 @@ def make_agent(name, model):
     return Agent(
         name=name,
         model=model,
+        skills=[stats_skill,tactical_skill,sentiment_skill],
         role="Analista independente de futebol",
         instructions=SHARED_INSTRUCTIONS,
     )
@@ -164,6 +183,81 @@ if __name__ == "__main__":
     )
 ```
 
+## Código Base versão modelos locais
+```python
+from agno.agent import Agent
+from agno.team import Team
+from agno.team.mode import TeamMode
+from agno.tools.reasoning import ReasoningTools
+from agno.models.openai.like import OpenAILike
+from agno.skills import Skills, LocalSkills
+
+# --- Skills compartilhadas ---
+stats_skill    = Skills(loaders=[LocalSkills("skills/stats-skill")])
+tactical_skill = Skills(loaders=[LocalSkills("skills/tactical-skill")])
+sentiment_skill = Skills(loaders=[LocalSkills("skills/sentiment-skill")])
+
+# Instruções compartilhadas — todos analisam da mesma forma
+SHARED_INSTRUCTIONS = [
+    "Analise o jogo usando dados estatísticos (xG, posse, gols, defesa).",
+    "Considere o sentimento popular do X e Reddit.",
+    "Avalie táticas, escalações, lesões e condições do jogo.",
+    "Ao final, declare seu placar previsto com justificativa clara.",
+    "Seja independente — não tente adivinhar o que outros modelos dirão.",
+]
+
+
+def make_agent(name, model_id, base_url, api_key="ollama"):
+    return Agent(
+        name=name,
+        model=OpenAILike(
+            id=model_id,
+            base_url=base_url,
+            api_key=api_key,  # local geralmente não precisa
+            skills=[stats_skill,tactical_skill,sentiment_skill],
+        ),
+        role="Analista independente de futebol",
+        instructions=SHARED_INSTRUCTIONS,
+    )
+
+agents = [
+    make_agent("Llama3",   "llama3.3:70b",         "http://localhost:11434/v1"),
+    make_agent("Mistral",  "mistral:latest",        "http://localhost:11434/v1"),
+    make_agent("DeepSeek", "deepseek-r1:14b",       "http://localhost:11434/v1"),
+    make_agent("Gemma",    "gemma3:27b",            "http://localhost:11434/v1"),
+    make_agent("Qwen",     "qwen2.5:32b",           "http://localhost:11434/v1"),
+    make_agent("Phi4",     "phi4:latest",           "http://localhost:11434/v1"),
+]
+
+moderator = Team(
+    name="World Cup Debate Team",
+    mode=TeamMode.broadcast,
+    model=OpenAIResponses(id="gpt-4o"),
+    members=agents,
+    tools=[ReasoningTools(add_instructions=True)],
+    instructions=[
+        "Você é o moderador. Após receber as previsões de todos os modelos:",
+        "1. Agrupe os modelos que chegaram ao mesmo placar ou placar similar.",
+        "2. Crie quantos grupos forem necessários (A, B, C, D...) — não force agrupamentos.",
+        "3. Calcule a porcentagem de cada grupo sobre o total de modelos.",
+        "4. Liste os principais argumentos de cada grupo.",
+        "5. Declare o placar com maior probabilidade como previsão final.",
+        "Apresente o resultado em formato de relatório claro com markdown.",
+    ],
+    show_members_responses=True,
+    markdown=True,
+)
+
+if __name__ == "__main__":
+    moderator.print_response(
+        "Jogo: Brasil x Argentina — Copa do Mundo 2026, Fase de Grupos",
+        stream=True,
+        show_full_reasoning=True,
+    )
+```
+
+
+
 ---
 
 ## Stack & Referências
@@ -175,6 +269,10 @@ if __name__ == "__main__":
 | ReasoningTools | Raciocínio estruturado no moderador | [Team with Reasoning](https://docs.agno.com/reasoning/usage/tools/reasoning-tool-team) |
 | Teams Overview | Como times funcionam no Agno | [Teams Overview](https://docs.agno.com/teams/overview) |
 | Modelos Suportados | Todos os modelos disponíveis | [Models Overview](https://docs.agno.com/models/overview) |
+| Skills Overview | [docs.agno.com/skills/overview](https://docs.agno.com/skills/overview) |
+| Team Skills | [docs.agno.com/skills/team-skills](https://docs.agno.com/skills/team-skills) |
+| OpenAI-compatible Modelos | modelos OpenAI-compatible | [OpenAI-compatible](https://docs.agno.com/models/providers/openai-like) |
+| LlamaCpp | Run local models with LlamaCpp  | [LlamaCpp](https://docs.agno.com/models/providers/local/llama-cpp/overview) |
 
 
 ---

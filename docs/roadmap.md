@@ -85,7 +85,7 @@ jobs:
 ## 3. Scripts das skills como Agno tools
 
 > ✅ **Concluído.** Skills via `LocalSkills` em
-> [skills.py](../src/copa_gambi/skills.py); tools registradas
+> [skills.py](../src/copa_gambi/core/skill_loader.py); tools registradas
 > em [tools/registry.py](../src/copa_gambi/tools/registry.py)
 > e plugadas no [agents/factory.py](../src/copa_gambi/agents/factory.py)
 > via `Agent(skills=..., tools=...)`. Default carrega:

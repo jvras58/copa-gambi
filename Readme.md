@@ -106,15 +106,15 @@ copa-gambi/
 │   └── sentiment-skill/
 └── src/copa_gambi/         # namespace package (PEP 420, sem __init__.py)
     ├── __main__.py         # python -m copa_gambi
-    ├── instructions.py     # SHARED_INSTRUCTIONS, MODERATOR_INSTRUCTIONS
-    ├── skills.py           # load_shared_skills (Agno LocalSkills loader)
     ├── cli/
     │   └── main.py         # Typer: participants, predict
     ├── core/
     │   ├── config.py       # pydantic-settings (Settings)
     │   ├── schemas.py      # Participant, ParticipantSpecs (Pydantic)
     │   ├── hub.py          # fetch_participants, elect_moderator
-    │   └── capabilities.py # resolve_capabilities + preflight probe
+    │   ├── capabilities.py # resolve_capabilities + preflight probe
+    │   ├── instructions.py # SHARED_INSTRUCTIONS, MODERATOR_INSTRUCTIONS
+    │   └── skill_loader.py # load_shared_skills (Agno LocalSkills loader)
     ├── tools/
     │   ├── stats.py        # FootballDataTools (football-data.org)
     │   └── registry.py     # load_default_tools: DDG + Reddit + stats + Exa
@@ -141,10 +141,10 @@ Para adicionar uma dependência: `uv add <pkg>` (ou `uv add --dev <pkg>` para gr
 
 | O que mudar | Onde mexer |
 |---|---|
-| Texto das instruções dos agentes ou do moderador | [src/copa_gambi/instructions.py](src/copa_gambi/instructions.py) |
+| Texto das instruções dos agentes ou do moderador | [src/copa_gambi/core/instructions.py](src/copa_gambi/core/instructions.py) |
 | Regra de eleição do moderador (hoje: maior VRAM) | [src/copa_gambi/core/hub.py](src/copa_gambi/core/hub.py) — `elect_moderator` |
 | Campos extras esperados do Gambi (CPU, RAM, etc.) | [src/copa_gambi/core/schemas.py](src/copa_gambi/core/schemas.py) |
-| Skills compartilhadas (lista carregada) | [src/copa_gambi/skills.py](src/copa_gambi/skills.py) — `SKILL_DIRS` |
+| Skills compartilhadas (lista carregada) | [src/copa_gambi/core/skill_loader.py](src/copa_gambi/core/skill_loader.py) — `SKILL_DIRS` |
 | Conteúdo de uma skill (instruções + scripts) | [skills/<nome>/SKILL.md](skills/) + `scripts/` ao lado |
 | Lista default de tools dos agentes | [src/copa_gambi/tools/registry.py](src/copa_gambi/tools/registry.py) — `load_default_tools` |
 | Tool nova / API esportiva extra | adicionar arquivo em [src/copa_gambi/tools/](src/copa_gambi/tools/) e plugar no `registry.py` |

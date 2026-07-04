@@ -5,7 +5,6 @@ from agno.agent import Agent
 from agno.models.openai.like import OpenAILike
 from agno.skills import Skills
 
-from copa_gambi.agents.capabilities import resolve_capabilities
 from copa_gambi.agents.instructions import (
     AGENT_ROLE,
     NO_RESEARCH_INSTRUCTIONS,
@@ -13,6 +12,7 @@ from copa_gambi.agents.instructions import (
 )
 from copa_gambi.agents.skills import load_shared_skills
 from copa_gambi.agents.tools.registry import load_default_tools
+from copa_gambi.core.capabilities import resolve_capabilities
 from copa_gambi.core.config import Settings, settings
 from copa_gambi.core.schemas import Participant
 

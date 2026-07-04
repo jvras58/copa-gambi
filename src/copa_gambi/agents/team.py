@@ -2,11 +2,11 @@ from agno.team import Team
 from agno.team.mode import TeamMode
 from agno.tools.reasoning import ReasoningTools
 
-from copa_gambi.agents.capabilities import resolve_capabilities
 from copa_gambi.agents.factory import build_model, make_agent
 from copa_gambi.agents.instructions import MODERATOR_INSTRUCTIONS, TEAM_NAME
 from copa_gambi.agents.skills import load_shared_skills
 from copa_gambi.agents.tools.registry import load_default_tools
+from copa_gambi.core.capabilities import resolve_capabilities
 from copa_gambi.core.config import Settings, settings
 from copa_gambi.core.hub import elect_moderator, fetch_participants
 from copa_gambi.core.schemas import Participant

@@ -23,8 +23,6 @@ from copa_gambi.core.schemas import Participant
 
 logger = logging.getLogger(__name__)
 
-# Minimal no-op tool sent in the probe request: we only care whether the
-# server accepts the `tools` field for this model, not what the model answers.
 _PROBE_TOOL = {
     "type": "function",
     "function": {
@@ -80,8 +78,6 @@ def probe_tools_support(participant: Participant, cfg: Settings = settings) -> b
 
     if response.is_success:
         return True
-    # Ollama-style servers reject unsupported models with a 4xx whose body
-    # mentions tools (e.g. "llama3.2:1b does not support tools").
     if 400 <= response.status_code < 500 and "tool" in response.text.lower():
         return False
     logger.warning(
@@ -108,8 +104,6 @@ def resolve_capabilities(participant: Participant, cfg: Settings = settings) -> 
     if use_skills is None:
         use_skills = not _matches_any(participant.model, cfg.no_skills_models)
 
-    # Skills are exercised through the get_skill_* tool calls, so a model that
-    # cannot do function calling cannot use skills either.
     if not use_tools:
         use_skills = False
 

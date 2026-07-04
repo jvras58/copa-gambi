@@ -25,6 +25,11 @@ O script:
 
 Fontes: DuckDuckGo News (sempre ativa) e Reddit (só quando `COPA_REDDIT_CLIENT_ID`/`COPA_REDDIT_CLIENT_SECRET` estão no ambiente).
 
+> O script é um wrapper fino sobre `copa_gambi.tools.sentiment` — a mesma lógica
+> também está disponível como tool direta (`matchup_sentiment`). Prefira a tool
+> quando ela estiver listada; use o script quando quiser controlar `--days` e
+> `--max-per-query` manualmente.
+
 ## Como interpretar a saída
 - `by_team.<time>.weighted_score`: -1.0 (clima negativo) a 1.0 (clima positivo). É uma **heurística por léxico** — trate como "tendência da torcida/mídia", não como fato.
 - `by_team.geral`: itens sobre o confronto em si (não sobre uma seleção específica).

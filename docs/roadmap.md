@@ -98,14 +98,14 @@ jobs:
 > quebrar — quem rodar sem `.env` ainda tem DDG.
 
 **O que sobrou.**
-- **Sentiment estruturado.** Hoje o agente decide o que extrair do Reddit
-  via reasoning. Se quiser um pipeline tipado (score agregado por seleção),
-  vale embrulhar `RedditTools.search_posts` num wrapper que devolva
-  `dict[str, float]`. Aproveitar [skills/sentiment-skill/scripts/fetch_sentiment.py](../skills/sentiment-skill/scripts/fetch_sentiment.py)
-  como base.
-- **Cache.** Sem rate-limit hoje porque o moderador roda local, mas
-  football-data tem 10 req/min — quando rodar repetido, considerar
-  `functools.cache` + `cache_results=True` no `Toolkit` (já suportado).
+- ~~**Sentiment estruturado.**~~ ✅ 2026-07-04 — pipeline tipado em
+  [tools/sentiment.py](../src/copa_gambi/tools/sentiment.py): `SentimentTools.matchup_sentiment`
+  devolve score agregado por seleção (news + Reddit, engajamento + janela +
+  dedupe); o script da skill virou wrapper fino do mesmo módulo.
+- ~~**Cache.**~~ ✅ 2026-07-04 — `cache_results=True` no `FootballDataTools`
+  (TTL 600s, protege os 10 req/min) e no `SentimentTools` (TTL 900s; os
+  debatedores compartilham a mesma instância, então o fan-out de queries
+  roda uma vez por confronto).
 - **Mais APIs esportivas.** Adicionar `api_football.py`, `understat.py`,
   etc. seguindo o mesmo padrão do `stats.py` e plugar no `registry.py`.
 - **Teste sem credencial.** `respx` mockando `api.football-data.org` para

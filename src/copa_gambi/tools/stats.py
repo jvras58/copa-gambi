@@ -26,6 +26,10 @@ class FootballDataTools(Toolkit):
                 "recent_matches for form and head_to_head for the rivalry history."
             ),
             add_instructions=True,
+            # Free tier allows 10 requests/minute and every debater asks the
+            # same questions about the same matchup — cache absorbs the repeat.
+            cache_results=True,
+            cache_ttl=600,
         )
 
     def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:

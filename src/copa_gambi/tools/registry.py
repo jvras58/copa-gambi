@@ -14,13 +14,24 @@ from agno.tools.exa import ExaTools
 from agno.tools.reddit import RedditTools
 
 from copa_gambi.core.config import Settings, settings
+from copa_gambi.tools.sentiment import SentimentTools
 from copa_gambi.tools.stats import FootballDataTools
 
 logger = logging.getLogger(__name__)
 
 
 def load_default_tools(cfg: Settings = settings) -> list[Any]:
-    tools: list[Any] = [DuckDuckGoTools(enable_news=True, fixed_max_results=5)]
+    tools: list[Any] = [
+        DuckDuckGoTools(enable_news=True, fixed_max_results=5),
+        # Typed one-call sentiment; runs on DuckDuckGo alone, Reddit deepens
+        # the sample when credentials exist. Cached, so the debaters share
+        # one fan-out per matchup.
+        SentimentTools(
+            reddit_client_id=cfg.reddit_client_id,
+            reddit_client_secret=cfg.reddit_client_secret,
+            reddit_user_agent=cfg.reddit_user_agent,
+        ),
+    ]
 
     if cfg.reddit_client_id and cfg.reddit_client_secret:
         tools.append(

@@ -23,7 +23,7 @@ def build_model(participant: Participant, cfg: Settings = settings) -> OpenAILik
 def make_agent(
     participant: Participant,
     cfg: Settings = settings,
-    skills: list[Skills] | None = None,
+    skills: Skills | None = None,
     tools: list[Any] | None = None,
 ) -> Agent:
     return Agent(

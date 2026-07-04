@@ -42,7 +42,12 @@ class FootballDataTools(Toolkit):
         """Resolve a team name into a football-data.org team id and short name."""
         data = self._get("/teams", params={"name": name})
         teams = [
-            {"id": t["id"], "name": t["name"], "tla": t.get("tla"), "area": t.get("area", {}).get("name")}
+            {
+                "id": t["id"],
+                "name": t["name"],
+                "tla": t.get("tla"),
+                "area": t.get("area", {}).get("name"),
+            }
             for t in data.get("teams", [])
         ]
         return {"query": name, "matches": teams[:10]}

@@ -23,4 +23,6 @@ def load_shared_skills(cfg: Settings = settings) -> list[Skills]:
     the local model behind each `Participant`, not the skills they have access to.
     """
     base = cfg.skills_dir.resolve()
-    return [Skills(loaders=[LocalSkills(str(_resolve_skill_path(base, name)))]) for name in SKILL_DIRS]
+    return [
+        Skills(loaders=[LocalSkills(str(_resolve_skill_path(base, name)))]) for name in SKILL_DIRS
+    ]

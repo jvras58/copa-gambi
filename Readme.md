@@ -96,7 +96,7 @@ Também dá pra rodar como módulo: `uv run python -m copa_gambi predict "..."`.
 uv run --group ui streamlit run src/copa_gambi/ui/app.py
 ```
 
-Mostra os participantes da room com badges de capacidade (tools/skills/só conhecimento, coroa no moderador), a previsão de cada debatedor e o relatório do moderador com grupos, percentuais e placar final. A visualização rica depende de um apêndice JSON que o moderador é instruído a escrever **em texto** no fim do relatório — nada de `response_format` ou function calling, então moderador fraco não quebra: se o bloco vier faltando ou inválido, a UI mostra o relatório markdown original.
+Mostra os participantes da room com badges de capacidade (tools/skills/só conhecimento, coroa no moderador), a previsão de cada debatedor e o relatório do moderador com grupos, percentuais e placar final. A visualização rica depende de um apêndice JSON que o moderador é instruído a escrever **em texto** no fim do relatório — nada de `response_format` ou function calling, então moderador fraco não quebra: JSON imperfeito passa pelo [json-repair](https://pypi.org/project/json-repair/) (aspas simples, vírgula sobrando, fechamento faltando) e, se mesmo assim nada validar, a UI mostra o relatório markdown original.
 
 ---
 

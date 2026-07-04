@@ -351,6 +351,7 @@ dev = [
     { name = "ruff" },
 ]
 ui = [
+    { name = "json-repair" },
     { name = "streamlit" },
 ]
 
@@ -369,7 +370,10 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.8.0" }]
-ui = [{ name = "streamlit", specifier = ">=1.40" }]
+ui = [
+    { name = "json-repair", specifier = ">=0.61.1" },
+    { name = "streamlit", specifier = ">=1.40" },
+]
 
 [[package]]
 name = "ddgs"
@@ -681,6 +685,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/e7/95/a06692b29e77473f286e1ec1f426d3ca44d7b5843be8ad21d7a5f3fcdcc0/jiter-0.15.0-graalpy312-graalpy250_312_native-macosx_11_0_arm64.whl", hash = "sha256:b6c0ffae686c39bf3737be60793783267628783ea42545632c10b291105aee45", size = 305128, upload-time = "2026-05-19T10:09:43.657Z" },
     { url = "https://files.pythonhosted.org/packages/23/85/7270d7ad41d6061a25b950c6bf91d638bd9aacb113200a8c8d57a055fd67/jiter-0.15.0-graalpy312-graalpy250_312_native-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1d54fb5b31dea401a41af3f8a7d2512e9b6a6a005491e6166c7e4ffab9639a9c", size = 340459, upload-time = "2026-05-19T10:09:45.452Z" },
     { url = "https://files.pythonhosted.org/packages/c8/8d/302cb2057b7513327b4d575cff6b1d066ee6431a5357fc3f8867cd684406/jiter-0.15.0-graalpy312-graalpy250_312_native-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:54d5d6090cdc1b7c9e780dfb04949a990adb1e301a2fc0bbcee7de4638d33f9a", size = 344469, upload-time = "2026-05-19T10:09:46.864Z" },
+]
+
+[[package]]
+name = "json-repair"
+version = "0.61.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/92/b46b19c400cdb87c634778cc7eec140c922f7ec0af3941d1e4a04ebeda81/json_repair-0.61.1.tar.gz", hash = "sha256:24a68de2891c696ad3bd9a94874e8d3ef2d309c56af2973094b8297c975b5b58", size = 50069, upload-time = "2026-06-29T12:09:55.104Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/36/0d/abd5fe1251c8588c6c8d441fab263734bcaa71dfd895ec4b88c202a86254/json_repair-0.61.1-py3-none-any.whl", hash = "sha256:7ab26583e4c73418b8b60cc61202f64f119984a9b5fed61087e84158fa29e7d0", size = 48543, upload-time = "2026-06-29T12:09:53.962Z" },
 ]
 
 [[package]]

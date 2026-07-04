@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 
 import httpx
@@ -22,4 +23,5 @@ if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("usage: fetch_stats.py <team_a> <team_b>", file=sys.stderr)
         raise SystemExit(2)
-    print(json.dumps(fetch(sys.argv[1], sys.argv[2]), indent=2, ensure_ascii=False))
+    token = os.environ.get("COPA_FOOTBALL_DATA_TOKEN")
+    print(json.dumps(fetch(sys.argv[1], sys.argv[2], token=token), indent=2, ensure_ascii=False))

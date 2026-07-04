@@ -128,6 +128,7 @@ skills/
 | Descoberta dinâmica + eleição do moderador | [src/copa_gambi/core/hub.py](../src/copa_gambi/core/hub.py) |
 | Instruções compartilhadas + do moderador | [src/copa_gambi/agents/instructions.py](../src/copa_gambi/agents/instructions.py) |
 | Carregamento das skills compartilhadas | [src/copa_gambi/agents/skills.py](../src/copa_gambi/agents/skills.py) |
+| Tools default (DDG + Reddit + football-data) | [src/copa_gambi/agents/tools/registry.py](../src/copa_gambi/agents/tools/registry.py) |
 | Fábrica de `Agent` + `OpenAILike` model | [src/copa_gambi/agents/factory.py](../src/copa_gambi/agents/factory.py) |
 | Montagem do `Team` em broadcast mode | [src/copa_gambi/agents/team.py](../src/copa_gambi/agents/team.py) |
 | Entry-point CLI (`participants`, `predict`) | [src/copa_gambi/cli/main.py](../src/copa_gambi/cli/main.py) |

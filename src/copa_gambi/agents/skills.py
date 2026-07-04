@@ -16,11 +16,14 @@ def _resolve_skill_path(base: Path, name: str) -> Path:
     return path
 
 
-def load_shared_skills(cfg: Settings = settings) -> list[Skills]:
-    """Load the three shared skills as Agno `Skills` instances.
+def load_shared_skills(cfg: Settings = settings) -> Skills:
+    """Load the shared skills as a single Agno `Skills` container.
 
-    Every debater agent gets the same list; the difference between agents is
-    the local model behind each `Participant`, not the skills they have access to.
+    `Agent.skills` takes one `Skills` instance holding every skill, not a list.
+    Every debater agent gets the same container; the difference between agents
+    is the local model behind each `Participant`, not the skills they can use.
     """
     base = cfg.skills_dir.resolve()
-    return [Skills(loaders=[LocalSkills(str(_resolve_skill_path(base, name)))]) for name in SKILL_DIRS]
+    return Skills(
+        loaders=[LocalSkills(str(_resolve_skill_path(base, name))) for name in SKILL_DIRS]
+    )

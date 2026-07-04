@@ -84,42 +84,32 @@ jobs:
 
 ## 3. Scripts das skills como Agno tools
 
-> ✅ Carregamento das skills via `agno.skills.Skills` + `LocalSkills` já está
-> implementado em [agents/skills.py](../src/copa_gambi/agents/skills.py) e
-> plugado no [agents/factory.py](../src/copa_gambi/agents/factory.py).
-> O que falta é o passo abaixo: transformar os **scripts** dentro de cada skill
-> em tools executáveis pelos agentes.
+> ✅ **Concluído.** Skills via `LocalSkills` em
+> [agents/skills.py](../src/copa_gambi/agents/skills.py); tools registradas
+> em [agents/tools/registry.py](../src/copa_gambi/agents/tools/registry.py)
+> e plugadas no [agents/factory.py](../src/copa_gambi/agents/factory.py)
+> via `Agent(skills=..., tools=...)`. Default carrega:
+> - `DuckDuckGoTools` (sempre, sem auth) — busca + news
+> - `RedditTools` (se `COPA_REDDIT_CLIENT_ID/SECRET` setados)
+> - `FootballDataTools` (se `COPA_FOOTBALL_DATA_TOKEN` setado) com
+>   `search_team`, `recent_matches` e `head_to_head` contra football-data.org
+>
+> Tools opcionais sem credencial são puladas com log INFO em vez de
+> quebrar — quem rodar sem `.env` ainda tem DDG.
 
-**Objetivo.** Hoje os `SKILL.md` chegam aos agentes como contexto (instruções
-de quando/como usar), mas `scripts/fetch_stats.py` e `scripts/fetch_sentiment.py`
-ainda não rodam — são só stubs documentais. Plugar como tools para que cada
-agente decida quando buscar stats / sentimento / formação.
-
-**Onde mexer.**
-- Criar `src/copa_gambi/agents/tools/` com funções/classes plugáveis:
-  - `stats.py` — wrapper sobre [skills/stats-skill/scripts/fetch_stats.py](../skills/stats-skill/scripts/fetch_stats.py)
-  - `sentiment.py` — wrapper sobre [skills/sentiment-skill/scripts/fetch_sentiment.py](../skills/sentiment-skill/scripts/fetch_sentiment.py)
-  - `tactical.py` — lookup em [skills/tactical-skill/references/formations.md](../skills/tactical-skill/references/formations.md)
-- Em [agents/factory.py](../src/copa_gambi/agents/factory.py), passar `tools=[...]` ao `Agent(...)` ao lado do `skills=[...]` que já existe.
-- Esquema sugerido (Agno aceita callables ou `Toolkit`):
-  ```python
-  Agent(
-      ...,
-      skills=shared_skills,
-      tools=[get_match_stats, get_public_sentiment, lookup_formation],
-      show_tool_calls=True,
-  )
-  ```
-- Cada tool deve devolver **um dict pequeno e tipado** — Pydantic ajuda a manter o contrato estável.
-
-**Done when.**
-- Pelo menos uma tool real chamada por um agente em um run de exemplo.
-- Tools mockáveis em teste (não dependem de credencial em CI).
-- README atualizado com "como adicionar uma skill + tool" em uma seção.
-
-**Notas.**
-- Credenciais de APIs externas (football-data.org, X) vêm via `Settings` (novos campos em `core/config.py`), nunca hardcoded.
-- Considere cache em disco (`functools.cache` + arquivo) para não estourar rate limit em desenvolvimento.
+**O que sobrou.**
+- **Sentiment estruturado.** Hoje o agente decide o que extrair do Reddit
+  via reasoning. Se quiser um pipeline tipado (score agregado por seleção),
+  vale embrulhar `RedditTools.search_posts` num wrapper que devolva
+  `dict[str, float]`. Aproveitar [skills/sentiment-skill/scripts/fetch_sentiment.py](../skills/sentiment-skill/scripts/fetch_sentiment.py)
+  como base.
+- **Cache.** Sem rate-limit hoje porque o moderador roda local, mas
+  football-data tem 10 req/min — quando rodar repetido, considerar
+  `functools.cache` + `cache_results=True` no `Toolkit` (já suportado).
+- **Mais APIs esportivas.** Adicionar `api_football.py`, `understat.py`,
+  etc. seguindo o mesmo padrão do `stats.py` e plugar no `registry.py`.
+- **Teste sem credencial.** `respx` mockando `api.football-data.org` para
+  validar `FootballDataTools.search_team` em CI sem token real.
 
 ---
 

@@ -30,9 +30,13 @@ def participants() -> None:
 
 @app.command()
 def predict(
-    matchup: str = typer.Argument(..., help='e.g. "Brasil x Argentina — Copa do Mundo 2026, Fase de Grupos"'),
+    matchup: str = typer.Argument(
+        ..., help='e.g. "Brasil x Argentina — Copa do Mundo 2026, Fase de Grupos"'
+    ),
     stream: bool = typer.Option(True, "--stream/--no-stream", help="Stream tokens as they arrive."),
-    reasoning: bool = typer.Option(True, "--reasoning/--no-reasoning", help="Show full moderator reasoning."),
+    reasoning: bool = typer.Option(
+        True, "--reasoning/--no-reasoning", help="Show full moderator reasoning."
+    ),
 ) -> None:
     """Run the broadcast debate for a matchup and print the moderator report."""
     try:

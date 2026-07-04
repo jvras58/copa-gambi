@@ -6,6 +6,12 @@ SHARED_INSTRUCTIONS: list[str] = [
     "Seja independente — chegue à sua própria conclusão.",
 ]
 
+
+NO_RESEARCH_INSTRUCTIONS: list[str] = [
+    "Você NÃO tem ferramentas de pesquisa neste debate — não tente chamar funções.",
+    "Baseie-se apenas no seu conhecimento sobre as seleções e diga que a análise não usa dados atuais.",
+]
+
 MODERATOR_INSTRUCTIONS: list[str] = [
     "Você é o moderador. Após receber as previsões de todos os modelos:",
     "1. Agrupe os modelos que chegaram ao mesmo placar ou placar similar.",

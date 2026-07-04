@@ -40,6 +40,19 @@ Variáveis lidas via `pydantic-settings` (prefixo `COPA_`, arquivo `.env`):
 | `COPA_API_KEY`       | `gambi`                  | API key enviada ao endpoint OpenAI-compat   |
 | `COPA_REQUEST_TIMEOUT` | `30`                   | Timeout HTTP (segundos)                     |
 | `COPA_SKILLS_DIR`    | `skills`                 | Diretório das skills compartilhadas (Agno)  |
+| `COPA_REDDIT_CLIENT_ID` | _vazio_               | OAuth Reddit (sentiment). Vazio = `RedditTools` desligado |
+| `COPA_REDDIT_CLIENT_SECRET` | _vazio_           | OAuth Reddit (sentiment)                    |
+| `COPA_REDDIT_USER_AGENT` | `copa-gambi/0.1 (sentiment)` | User-Agent exigido pela API Reddit |
+| `COPA_FOOTBALL_DATA_TOKEN` | _vazio_             | Token football-data.org (stats). Vazio = tool desligada |
+| `COPA_EXA_API_KEY`   | _vazio_                  | API key do [Exa](https://exa.ai) (busca semântica, últimos 30 dias). Vazio = `ExaTools` desligada |
+| `COPA_NO_TOOLS_MODELS` | _vazio_                | Substrings de ids de modelos sem function calling (ex.: `llama3.2:1b,tinyllama`). Debatem sem tools e sem skills |
+| `COPA_NO_SKILLS_MODELS` | _vazio_               | Substrings de ids de modelos que usam tools mas não dão conta do fluxo de skills. Mantêm tools, perdem skills |
+
+> Tools opcionais (`RedditTools`, `FootballDataTools`, `ExaTools`) são ignoradas com log INFO quando a credencial estiver vazia. `DuckDuckGoTools` está sempre ativa (não exige auth).
+
+### Modelos menos capazes
+
+Todo participante debate, mesmo que o modelo não saiba usar tool nem skill. A capacidade é resolvida por participante: flags explícitas `supports_tools`/`supports_skills` nas specs (se o Hub enviar) têm prioridade; sem elas, valem os padrões `COPA_NO_TOOLS_MODELS`/`COPA_NO_SKILLS_MODELS`; o default é capacidade total. Skills dependem de function calling, então modelo sem tools perde as skills junto. Agentes sem pesquisa recebem instruções para argumentar só com o próprio conhecimento, sem inventar chamadas de função — e se o moderador cair nessa categoria, ele também dispensa as `ReasoningTools`.
 
 ---
 
@@ -101,6 +114,9 @@ copa-gambi/
     └── agents/
         ├── instructions.py # SHARED_INSTRUCTIONS, MODERATOR_INSTRUCTIONS
         ├── skills.py       # load_shared_skills (Agno LocalSkills loader)
+        ├── tools/
+        │   ├── stats.py    # FootballDataTools (football-data.org)
+        │   └── registry.py # load_default_tools: DDG + Reddit + stats
         ├── factory.py      # make_agent, build_model
         └── team.py         # build_team, build_team_from_hub
 ```
@@ -128,7 +144,8 @@ Para adicionar uma dependência: `uv add <pkg>` (ou `uv add --dev <pkg>` para gr
 | Campos extras esperados do Gambi (CPU, RAM, etc.) | [src/copa_gambi/core/schemas.py](src/copa_gambi/core/schemas.py) |
 | Skills compartilhadas (lista carregada) | [src/copa_gambi/agents/skills.py](src/copa_gambi/agents/skills.py) — `SKILL_DIRS` |
 | Conteúdo de uma skill (instruções + scripts) | [skills/<nome>/SKILL.md](skills/) + `scripts/` ao lado |
-| Tools executáveis pelos agentes (xG, sentimento) | [src/copa_gambi/agents/factory.py](src/copa_gambi/agents/factory.py) — passar `tools=[...]` |
+| Lista default de tools dos agentes | [src/copa_gambi/agents/tools/registry.py](src/copa_gambi/agents/tools/registry.py) — `load_default_tools` |
+| Tool nova / API esportiva extra | adicionar arquivo em [src/copa_gambi/agents/tools/](src/copa_gambi/agents/tools/) e plugar no `registry.py` |
 | Novo subcomando CLI | [src/copa_gambi/cli/main.py](src/copa_gambi/cli/main.py) |
 
 Mais detalhes em:

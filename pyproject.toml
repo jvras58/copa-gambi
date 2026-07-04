@@ -32,6 +32,9 @@ packages = ["src/copa_gambi"]
 dev = [
     "ruff>=0.8.0",
 ]
+ui = [
+    "streamlit>=1.40",
+]
 
 [tool.ruff]
 line-length = 100

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "streamlit-ui",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "--group", "ui", "streamlit", "run", "src/copa_gambi/ui/app.py", "--server.headless", "true", "--server.port", "8501"],
+      "port": 8501
+    }
+  ]
+}

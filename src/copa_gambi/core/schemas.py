@@ -28,6 +28,27 @@ class ParticipantSpecs(BaseModel):
     )
 
 
+class ScoreGroup(BaseModel):
+    """One cluster of models that converged on the same predicted score."""
+
+    score: str = Field(description='Predicted score, e.g. "2x1".')
+    models: list[str] = Field(default_factory=list)
+    percentage: float = Field(default=0.0, description="Share of models in this group (0-100).")
+    arguments: list[str] = Field(default_factory=list)
+
+
+class DebateReport(BaseModel):
+    """Structured appendix the moderator is asked to emit as a fenced JSON block.
+
+    Weak models may skip or mangle the block — the UI treats parsing failure
+    as cosmetic and falls back to the raw markdown report.
+    """
+
+    groups: list[ScoreGroup] = Field(default_factory=list)
+    final_score: str = Field(description="The winning prediction.")
+    rationale: str = ""
+
+
 class Participant(BaseModel):
     model_config = ConfigDict(extra="allow")
 

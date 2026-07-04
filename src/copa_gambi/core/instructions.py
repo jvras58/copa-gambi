@@ -20,6 +20,13 @@ MODERATOR_INSTRUCTIONS: list[str] = [
     "4. Liste os principais argumentos de cada grupo.",
     "5. Declare o placar com maior probabilidade como previsão final.",
     "Apresente o resultado em formato de relatório claro com markdown.",
+    # Structured appendix consumed by the web UI. Asked in plain text on
+    # purpose: no response_format nor function calling involved, so a weak
+    # moderator can still try — if it skips or mangles the block, the UI
+    # falls back to rendering the raw markdown.
+    "Ao final do relatório, adicione um bloco de código ```json com exatamente este formato: "
+    '{"groups": [{"score": "2x1", "models": ["id1", "id2"], "percentage": 60, '
+    '"arguments": ["argumento"]}], "final_score": "2x1", "rationale": "resumo em uma frase"}.',
 ]
 
 AGENT_ROLE = "Analista independente de futebol"

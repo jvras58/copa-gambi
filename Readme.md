@@ -90,6 +90,14 @@ uv run copa-gambi predict "Brasil x Argentina" --no-stream --no-reasoning
 
 Também dá pra rodar como módulo: `uv run python -m copa_gambi predict "..."`.
 
+### Interface web (Streamlit)
+
+```bash
+uv run --group ui streamlit run src/copa_gambi/ui/app.py
+```
+
+Mostra os participantes da room com badges de capacidade (tools/skills/só conhecimento, coroa no moderador), a previsão de cada debatedor e o relatório do moderador com grupos, percentuais e placar final. A visualização rica depende de um apêndice JSON que o moderador é instruído a escrever **em texto** no fim do relatório — nada de `response_format` ou function calling, então moderador fraco não quebra: se o bloco vier faltando ou inválido, a UI mostra o relatório markdown original.
+
 ---
 
 ## Estrutura do projeto
@@ -118,9 +126,14 @@ copa-gambi/
     ├── tools/
     │   ├── stats.py        # FootballDataTools (football-data.org)
     │   └── registry.py     # load_default_tools: DDG + Reddit + stats + Exa
-    └── agents/             # somente os construtores de objetos Agno
-        ├── factory.py      # make_agent, build_model
-        └── team.py         # build_team, build_team_from_hub
+    ├── agents/             # somente os construtores de objetos Agno
+    │   ├── factory.py      # make_agent, build_model
+    │   └── team.py         # build_team, build_team_from_hub
+    └── ui/                 # painel Streamlit (grupo de dependência `ui`)
+        ├── app.py          # entrypoint: streamlit run src/copa_gambi/ui/app.py
+        ├── debate.py       # load_setup, run_debate (sem imports de Streamlit)
+        ├── report.py       # parsing tolerante do apêndice JSON do moderador
+        └── components.py   # render_participants, render_members, render_report
 ```
 
 ---

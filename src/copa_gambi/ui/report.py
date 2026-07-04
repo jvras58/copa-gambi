@@ -14,9 +14,6 @@ from pydantic import ValidationError
 
 from copa_gambi.core.schemas import DebateReport
 
-# Accepts any language tag: matching only ```json would desync the fence
-# pairing when other fenced blocks precede it — Pydantic validation is what
-# decides whether a block is the structured appendix.
 _FENCED_BLOCK = re.compile(r"```[\w-]*[ \t]*\n(.*?)```", re.DOTALL)
 
 
@@ -66,8 +63,6 @@ def strip_report_blocks(text: str) -> str:
     return _FENCED_BLOCK.sub(_replace, text or "").strip()
 
 
-# The multiplication sign in the class is deliberate: models write the score
-# both with the letter x and with the unicode times sign.
 _SCORE = re.compile(r"\b(\d{1,2})\s*[x×:-]\s*(\d{1,2})\b")  # noqa: RUF001
 
 

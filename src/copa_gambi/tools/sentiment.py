@@ -115,8 +115,6 @@ def expand_queries(matchup: str) -> dict[str, list[str]]:
     teams = [t.strip() for t in MATCHUP_SEPARATOR.split(matchup) if t.strip()]
     queries: dict[str, list[str]] = {"geral": [matchup]}
     for team in teams:
-        # The bare team name alone drags in off-topic news (economy, tourism…),
-        # so it is always scoped to the tournament.
         queries[team] = [f"{team} Copa do Mundo", *TEAM_ALIASES.get(team.lower(), [])]
     return queries
 
@@ -143,7 +141,7 @@ def fetch_ddg_news(query: str, team: str, days: int, max_results: int) -> list[I
             url=r.get("url", ""),
             team=team,
             published=_parse_date(r.get("date")),
-            engagement=1.0,  # news has no engagement metric; freshness decides
+            engagement=1.0,
             sources={"news"},
         )
         for r in rows

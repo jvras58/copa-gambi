@@ -23,9 +23,6 @@ logger = logging.getLogger(__name__)
 def load_default_tools(cfg: Settings = settings) -> list[Any]:
     tools: list[Any] = [
         DuckDuckGoTools(enable_news=True, fixed_max_results=5),
-        # Typed one-call sentiment; runs on DuckDuckGo alone, Reddit deepens
-        # the sample when credentials exist. Cached, so the debaters share
-        # one fan-out per matchup.
         SentimentTools(
             reddit_client_id=cfg.reddit_client_id,
             reddit_client_secret=cfg.reddit_client_secret,
@@ -50,9 +47,6 @@ def load_default_tools(cfg: Settings = settings) -> list[Any]:
         logger.info("FootballDataTools skipped: COPA_FOOTBALL_DATA_TOKEN not set.")
 
     if cfg.exa_api_key:
-        # Semantic search restricted to the last 30 days: stale takes about a
-        # squad are worse than no take at all. Only search + get_contents are
-        # exposed to keep the tool surface small for local models.
         month_ago = (datetime.now(tz=UTC) - timedelta(days=30)).strftime("%Y-%m-%d")
         tools.append(
             ExaTools(

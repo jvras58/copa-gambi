@@ -85,8 +85,8 @@ jobs:
 ## 3. Scripts das skills como Agno tools
 
 > ✅ **Concluído.** Skills via `LocalSkills` em
-> [agents/skills.py](../src/copa_gambi/agents/skills.py); tools registradas
-> em [agents/tools/registry.py](../src/copa_gambi/agents/tools/registry.py)
+> [skills.py](../src/copa_gambi/skills.py); tools registradas
+> em [tools/registry.py](../src/copa_gambi/tools/registry.py)
 > e plugadas no [agents/factory.py](../src/copa_gambi/agents/factory.py)
 > via `Agent(skills=..., tools=...)`. Default carrega:
 > - `DuckDuckGoTools` (sempre, sem auth) — busca + news

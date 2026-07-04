@@ -13,8 +13,8 @@ from agno.tools.duckduckgo import DuckDuckGoTools
 from agno.tools.exa import ExaTools
 from agno.tools.reddit import RedditTools
 
-from copa_gambi.agents.tools.stats import FootballDataTools
 from copa_gambi.core.config import Settings, settings
+from copa_gambi.tools.stats import FootballDataTools
 
 logger = logging.getLogger(__name__)
 

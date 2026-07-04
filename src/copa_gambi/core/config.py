@@ -72,6 +72,14 @@ class Settings(BaseSettings):
             "the skill workflow. Matching agents keep tools and lose skills."
         ),
     )
+    preflight_probe: bool = Field(
+        default=True,
+        description=(
+            "Probe each undeclared participant with a one-token tool request "
+            "before the debate; models whose server rejects tools join without "
+            "them instead of crashing the run."
+        ),
+    )
 
     @property
     def hub_base(self) -> str:

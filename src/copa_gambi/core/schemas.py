@@ -11,6 +11,22 @@ class ParticipantSpecs(BaseModel):
     cpu_cores: int | None = None
     ram_gb: float | None = None
 
+    supports_tools: bool | None = Field(
+        default=None,
+        description=(
+            "Whether the model can do function calling. None = unknown, "
+            "decided by the COPA_NO_TOOLS_MODELS setting."
+        ),
+    )
+    supports_skills: bool | None = Field(
+        default=None,
+        description=(
+            "Whether the model can follow the skill workflow. None = unknown, "
+            "decided by the COPA_NO_SKILLS_MODELS setting. Skills are accessed "
+            "through tool calls, so supports_tools=False also disables skills."
+        ),
+    )
+
 
 class Participant(BaseModel):
     model_config = ConfigDict(extra="allow")

@@ -2,6 +2,7 @@ from agno.team import Team
 from agno.team.mode import TeamMode
 from agno.tools.reasoning import ReasoningTools
 
+from copa_gambi.agents.capabilities import resolve_capabilities
 from copa_gambi.agents.factory import build_model, make_agent
 from copa_gambi.agents.instructions import MODERATOR_INSTRUCTIONS, TEAM_NAME
 from copa_gambi.agents.skills import load_shared_skills
@@ -21,12 +22,18 @@ def build_team(participants: list[Participant], cfg: Settings = settings) -> Tea
         if p.participant_id != moderator.participant_id
     ]
 
+    moderator_tools = (
+        [ReasoningTools(add_instructions=True)]
+        if resolve_capabilities(moderator, cfg).use_tools
+        else []
+    )
+
     return Team(
         name=TEAM_NAME,
         mode=TeamMode.broadcast,
         model=build_model(moderator, cfg),
         members=debaters,
-        tools=[ReasoningTools(add_instructions=True)],
+        tools=moderator_tools,
         instructions=MODERATOR_INSTRUCTIONS,
         show_members_responses=True,
         markdown=True,

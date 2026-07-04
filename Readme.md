@@ -45,8 +45,14 @@ Variáveis lidas via `pydantic-settings` (prefixo `COPA_`, arquivo `.env`):
 | `COPA_REDDIT_USER_AGENT` | `copa-gambi/0.1 (sentiment)` | User-Agent exigido pela API Reddit |
 | `COPA_FOOTBALL_DATA_TOKEN` | _vazio_             | Token football-data.org (stats). Vazio = tool desligada |
 | `COPA_EXA_API_KEY`   | _vazio_                  | API key do [Exa](https://exa.ai) (busca semântica, últimos 30 dias). Vazio = `ExaTools` desligada |
+| `COPA_NO_TOOLS_MODELS` | _vazio_                | Substrings de ids de modelos sem function calling (ex.: `llama3.2:1b,tinyllama`). Debatem sem tools e sem skills |
+| `COPA_NO_SKILLS_MODELS` | _vazio_               | Substrings de ids de modelos que usam tools mas não dão conta do fluxo de skills. Mantêm tools, perdem skills |
 
 > Tools opcionais (`RedditTools`, `FootballDataTools`, `ExaTools`) são ignoradas com log INFO quando a credencial estiver vazia. `DuckDuckGoTools` está sempre ativa (não exige auth).
+
+### Modelos menos capazes
+
+Todo participante debate, mesmo que o modelo não saiba usar tool nem skill. A capacidade é resolvida por participante: flags explícitas `supports_tools`/`supports_skills` nas specs (se o Hub enviar) têm prioridade; sem elas, valem os padrões `COPA_NO_TOOLS_MODELS`/`COPA_NO_SKILLS_MODELS`; o default é capacidade total. Skills dependem de function calling, então modelo sem tools perde as skills junto. Agentes sem pesquisa recebem instruções para argumentar só com o próprio conhecimento, sem inventar chamadas de função — e se o moderador cair nessa categoria, ele também dispensa as `ReasoningTools`.
 
 ---
 

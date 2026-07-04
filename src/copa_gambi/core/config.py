@@ -52,6 +52,11 @@ class Settings(BaseSettings):
         description="football-data.org API token. When unset, the stats tool is skipped.",
     )
 
+    exa_api_key: str | None = Field(
+        default=None,
+        description="Exa API key (https://exa.ai). When unset, ExaTools is skipped.",
+    )
+
     @property
     def hub_base(self) -> str:
         return str(self.hub_url).rstrip("/")

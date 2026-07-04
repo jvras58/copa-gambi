@@ -9,6 +9,7 @@ authors = [{ name = "jvras58", email = "jvras58@gmail.com" }]
 dependencies = [
     "agno>=2.5.0",
     "ddgs>=9.14.4",
+    "exa-py>=1.7.0",
     "httpx>=0.28.0",
     "openai>=1.54.0",
     "praw>=8.0.1",

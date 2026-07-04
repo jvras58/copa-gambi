@@ -44,8 +44,9 @@ Variáveis lidas via `pydantic-settings` (prefixo `COPA_`, arquivo `.env`):
 | `COPA_REDDIT_CLIENT_SECRET` | _vazio_           | OAuth Reddit (sentiment)                    |
 | `COPA_REDDIT_USER_AGENT` | `copa-gambi/0.1 (sentiment)` | User-Agent exigido pela API Reddit |
 | `COPA_FOOTBALL_DATA_TOKEN` | _vazio_             | Token football-data.org (stats). Vazio = tool desligada |
+| `COPA_EXA_API_KEY`   | _vazio_                  | API key do [Exa](https://exa.ai) (busca semântica, últimos 30 dias). Vazio = `ExaTools` desligada |
 
-> Tools opcionais (`RedditTools`, `FootballDataTools`) são ignoradas com log INFO quando a credencial estiver vazia. `DuckDuckGoTools` está sempre ativa (não exige auth).
+> Tools opcionais (`RedditTools`, `FootballDataTools`, `ExaTools`) são ignoradas com log INFO quando a credencial estiver vazia. `DuckDuckGoTools` está sempre ativa (não exige auth).
 
 ---
 
